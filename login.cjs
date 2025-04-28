@@ -22,12 +22,13 @@ router.post('/', (req, res) => {
         console.error('Erreur lors de la comparaison :', err);
         return;
       }
-    });
+
     if (result) {
       res.json({ success: true, message: 'Connexion réussie' });
     } else {
       res.json({ success: false, message: 'Mot de passe incorrect' });
     }
+      });
   });
 });
 
