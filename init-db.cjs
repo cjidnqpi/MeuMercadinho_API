@@ -24,7 +24,17 @@ db.serialize(() => {
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            name TEXT NOT NULL,
+            type INTEGER NOT NULL DEFAULT 1,
+            cpf TEXT,
+            phone TEXT,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            country TEXT,
+            postal_code TEXT
         )
     `);
 
@@ -36,9 +46,9 @@ db.serialize(() => {
         }
         if (row.count === 0) {
             console.log("Aucun utilisateur trouvé, insertion de l'utilisateur par défaut");
-            const stmt = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+            const stmt = db.prepare("INSERT INTO users (email, password, type, name) VALUES (?, ?, ?, ?)");
             const hash = bcrypt.hashSync("admin123", saltRounds);
-            stmt.run("admin@admin.com", hash);
+            stmt.run("admin@admin.com", hash, 0, "Admin");
             stmt.finalize();
         }
     });
