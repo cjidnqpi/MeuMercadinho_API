@@ -39,11 +39,3 @@ db.serialize(() => {
     });
 });
 
-// Fermer la base de données
-db.close((err) => {
-    if (err) {
-        console.error("Erreur lors de la fermeture de la base de données", err);
-    } else {
-        console.log('Base de données fermée');
-    }
-});
