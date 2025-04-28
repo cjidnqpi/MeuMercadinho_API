@@ -37,14 +37,8 @@ db.serialize(() => {
         if (row.count === 0) {
             console.log("Aucun utilisateur trouvé, insertion de l'utilisateur par défaut");
             const stmt = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-            bcrypt.hash("admin123", saltRounds, (err, hash) => {
-                if (err) {
-                console.error('Erreur lors du hash :', err);
-                return;
-                }
-
+            const hash = bcrypt.hashSync("admin123", saltRounds);
             stmt.run("admin@admin.com", hash);
-        });
             stmt.finalize();
         }
     });
