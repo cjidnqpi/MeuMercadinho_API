@@ -9,9 +9,6 @@ app.use(express.json());
 // Connexion à SQLite
 const db = new sqlite3.Database('./database.db');
 
-// Appel du fichier d'initialisation
-require('./init-db');
-
 // Route POST pour login (exemple)
 router.post('/', (req, res) => {
   const { email, password } = req.body;
