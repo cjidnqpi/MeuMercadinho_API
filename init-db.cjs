@@ -1,8 +1,18 @@
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
+const { hash } = require('crypto');
 const path = require('path');
-
+const saltRounds = 10;
 // Chemin vers la base de données
 const dbPath = path.join(__dirname, 'database.db');
+
+bcrypt.hash("admin123", saltRounds, (err, hash) => {
+    if (err) {
+      console.error('Erreur lors du hash :', err);
+      return;
+    }
+    console.log('Mot de passe hashé :', hash);
+});
 
 // Crée ou ouvre la base de données SQLite
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -33,7 +43,7 @@ db.serialize(() => {
         if (row.count === 0) {
             console.log("Aucun utilisateur trouvé, insertion de l'utilisateur par défaut");
             const stmt = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-            stmt.run("admin@admin.com", "admin123");
+            stmt.run("admin@admin.com", hash);
             stmt.finalize();
         }
     });

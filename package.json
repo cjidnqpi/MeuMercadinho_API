@@ -2,7 +2,6 @@
   "name": "meumercadinho_api",
   "version": "1.0.0",
   "main": "index.cjs",
-
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node init-db.cjs && node index.cjs"
@@ -20,6 +19,7 @@
   "homepage": "https://github.com/cjidnqpi/MeuMercadinho_API#readme",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7"
   }
