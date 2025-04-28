@@ -1,5 +1,4 @@
-import loginRouter from './login.js';
-
+const loginRouter = require('./login.js');
 const express = require('express');
 const app = express();
 app.use(express.json());
