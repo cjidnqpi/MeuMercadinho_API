@@ -4,13 +4,11 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const port = process.env.PORT || 3000;
 const router = express.Router();
+const { db, saltRounds } = require('./globals.cjs');
 
 app.use(express.json());
 
-// Connexion à SQLite
-const db = new sqlite3.Database('./database.db');
-
-// Route POST pour login (exemple)
+// Route POST pour login
 router.post('/', (req, res) => {
   const { email, password } = req.body;
 

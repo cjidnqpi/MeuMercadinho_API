@@ -1,14 +1,22 @@
 const loginRouter = require('./login.cjs');
+const registerClientRouter = require('./registerClient.cjs');
 const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 const app = express();
+const { db, saltRounds } = require('./globals.cjs');
 app.use(express.json());
 const port = 3000;
 
+
 // Appel du fichier d'initialisation
-require('./init-db.cjs');
+const initDB = require('./init-db.cjs');
 
 // Utilisation du router pour la route /login
 app.use('/login', loginRouter);
+
+// Utilisation du router pour la route /registerClient
+app.use('/registerClient', registerClientRouter);
 
 // Routes et autres configurations
 app.get('/', (req, res) => {
