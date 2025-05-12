@@ -136,4 +136,9 @@ dist
 .pnp.*
 
 # database
-database.db
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal

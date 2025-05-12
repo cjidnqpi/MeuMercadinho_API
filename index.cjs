@@ -1,5 +1,6 @@
 const loginRouter = require('./login.cjs');
 const registerClientRouter = require('./registerClient.cjs');
+const forgotPasswordRouter = require('./forgot-password.cjs');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
@@ -17,6 +18,9 @@ app.use('/login', loginRouter);
 
 // Utilisation du router pour la route /registerClient
 app.use('/registerClient', registerClientRouter);
+
+// Utilisation du router pour la route /forgot-password
+app.use('/forgot-password', forgotPasswordRouter);
 
 // Routes et autres configurations
 app.get('/', (req, res) => {

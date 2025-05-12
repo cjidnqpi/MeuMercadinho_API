@@ -20,7 +20,19 @@ const { db, saltRounds } = require('./globals.cjs');
                 city TEXT,
                 state TEXT,
                 country TEXT,
-                postal_code TEXT
+                postal_code TEXT,
+                profile_picture TEXT
+            )
+        `);
+        db.run(`
+            CREATE TABLE IF NOT EXISTS verification_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_mail TEXT NOT NULL,
+
+            code TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NOT NULL,
+            FOREIGN KEY (user_mail) REFERENCES users(email)
             )
         `);
 
