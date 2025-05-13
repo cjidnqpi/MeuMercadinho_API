@@ -1,9 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { db, saltRounds } = require('./globals.cjs');
-const sqlite3 = require('sqlite3').verbose();
 const app = express();
-const port = process.env.PORT || 3000;
 const router = express.Router();
 
 app.use(express.json());

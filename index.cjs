@@ -1,6 +1,7 @@
 const loginRouter = require('./login.cjs');
 const registerClientRouter = require('./registerClient.cjs');
 const forgotPasswordRouter = require('./forgot-password.cjs');
+const resetPasswordRouter = require('./reset-password.cjs');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
@@ -21,6 +22,10 @@ app.use('/registerClient', registerClientRouter);
 
 // Utilisation du router pour la route /forgot-password
 app.use('/forgot-password', forgotPasswordRouter);
+
+// Utilisation du router pour la route /reset-password
+app.use('/reset-password', resetPasswordRouter);
+
 
 // Routes et autres configurations
 app.get('/', (req, res) => {
