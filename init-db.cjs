@@ -35,6 +35,18 @@ const { db, saltRounds } = require('./globals.cjs');
             FOREIGN KEY (user_mail) REFERENCES users(email)
             )
         `);
+        db.run(`
+            CREATE TABLE IF NOT EXISTS waiting_line (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                name TEXT NOT NULL,
+                type INTEGER NOT NULL DEFAULT 0,
+                cnpj TEXT,
+                description TEXT
+        )
+        `);
 
         // Insertion de données par défaut si la table est vide
         db.get("SELECT COUNT(*) AS count FROM users", (err, row) => {
