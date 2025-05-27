@@ -42,7 +42,7 @@ const { db, saltRounds } = require('./globals.cjs');
                 password TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 name TEXT NOT NULL,
-                type INTEGER NOT NULL DEFAULT 0,
+                type INTEGER NOT NULL DEFAULT 1,
                 cnpj TEXT,
                 description TEXT
         )
