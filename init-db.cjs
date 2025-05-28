@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
-const { db, saltRounds } = require('./globals.cjs');
+const { db, saltRounds } = require('./src/config/globals.cjs');
 
 
         // Initialisation de la base de données

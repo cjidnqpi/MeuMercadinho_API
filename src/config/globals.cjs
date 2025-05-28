@@ -5,7 +5,7 @@ const path = require('path');
 const saltRounds = 10;
 
 // Connexion base de données
-const dbPath = path.join(__dirname, 'database.db');
+const dbPath = path.join(__dirname, '../../database/database.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error("Erreur d'ouverture de la base :", err.message);
