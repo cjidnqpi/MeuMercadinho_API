@@ -1,3 +1,4 @@
+require('dotenv').config();
 const loginRouter = require('./login.cjs');
 const registerClientRouter = require('./registerClient.cjs');
 const forgotPasswordRouter = require('./forgot-password.cjs');
