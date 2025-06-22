@@ -1,5 +1,5 @@
 const transporter = require('../utils/mailer.cjs');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db, saltRounds } = require('../config/globals.cjs');
 require('dotenv').config();
