@@ -2,6 +2,15 @@ const bcrypt = require('bcryptjs');
 const { db, saltRounds } = require('./src/config/globals.cjs');
 
 
+
+function generateEmail(index) {
+    return `user${index}@example.com`;
+}
+function generateName(index) {
+    return `User ${index}`;
+}
+
+
         // Initialisation de la base de données
     db.serialize(() => {
         // Création d'une table (si elle n'existe pas)
@@ -58,6 +67,13 @@ const { db, saltRounds } = require('./src/config/globals.cjs');
                 const stmt = db.prepare("INSERT INTO users (email, password, type, name) VALUES (?, ?, ?, ?)");
                 const hash = bcrypt.hashSync("admin123", saltRounds);
                 stmt.run("admin@admin.com", hash, 0, "Admin");
+                for (let i = 1; i <= 30; i++) {
+                    const email = generateEmail(i);
+                    const name = generateName(i);
+                    const hash = bcrypt.hashSync(`password${i}`, saltRounds);
+                    const type = i === 1 ? 0 : 1; // Par exemple, le premier est admin, les autres utilisateurs classiques
+                stmt.run(email, hash, type, name);
+                }
                 stmt.finalize();
             }
         });
