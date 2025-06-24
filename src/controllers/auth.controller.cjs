@@ -136,7 +136,7 @@ exports.resetPassword = (req, res) => {
 
 exports.getUser = (req, res) => {
   const userId = req.user.id;
-  db.get('SELECT id, email, name, cpf, type FROM users WHERE id = ?', [userId], (err, row) => {
+  db.get('SELECT id, email, name, cpf, type, phone, profile_picture FROM users WHERE id = ?', [userId], (err, row) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
     if (!row) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
       res.json({ success: true, user: row });
