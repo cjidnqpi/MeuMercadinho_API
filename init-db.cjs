@@ -29,7 +29,7 @@ function generateDescription(index) {
 
 // Initialisation de la base de données
 db.serialize(() => {
-    // Création des tables
+    // Création des tables existantes
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,6 +71,21 @@ db.serialize(() => {
         )
     `);
 
+    // ✅ Nouvelle table des produits
+    db.run(`
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            artisan_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            photo_url TEXT,
+            description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (artisan_id) REFERENCES users(id)
+        )
+    `);
+
     // Insertion utilisateurs
     db.get("SELECT COUNT(*) AS count FROM users", (err, row) => {
         if (err) {
@@ -82,6 +97,7 @@ db.serialize(() => {
             const stmt = db.prepare("INSERT INTO users (email, password, type, name) VALUES (?, ?, ?, ?)");
             const hash = bcrypt.hashSync("admin123", saltRounds);
             stmt.run("admin@admin.com", hash, 0, "Admin");
+            stmt.run("artisan@artisan.com", hash, 2, "Artisan");
             for (let i = 1; i <= 30; i++) {
                 const email = generateEmail(i);
                 const name = generateName(i);
@@ -114,5 +130,27 @@ db.serialize(() => {
             stmt.finalize();
         }
     });
+
+    // ✅ Insertion produits d'exemple
+    db.get("SELECT COUNT(*) AS count FROM products", (err, row) => {
+        if (err) {
+            console.error("Erreur lors de la vérification des produits", err);
+            return;
+        }
+        if (row.count === 0) {
+            console.log("Insertion de produits d'exemple...");
+            const stmt = db.prepare("INSERT INTO products (artisan_id, name, quantity, price, description) VALUES (?, ?, ?, ?, ?)");
+            for (let i = 1; i <= 10; i++) {
+                const artisanId = i + 1; // correspond à users.id > 1 (type = 1)
+                const name = `Produit ${i}`;
+                const quantity = 10 + i;
+                const price = 5.0 * i;
+                const description = `Description du produit ${i}`;
+                stmt.run(artisanId, name, quantity, price, description);
+            }
+            stmt.finalize();
+        }
+    });
+
     console.log("Base de données initialisée avec succès");
 });

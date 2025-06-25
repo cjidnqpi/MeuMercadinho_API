@@ -5,4 +5,6 @@ const verifyToken = require('../middlewares/verifyTokens.cjs');
 
 router.post('/upload-profile-picture', verifyToken, accountCtrl.setProfilePicture);
 router.put('/update-account', verifyToken, accountCtrl.updateAccount);
+router.get('/get-products', verifyToken, accountCtrl.getProducts);
+router.get('/get-products-artisan', verifyToken, accountCtrl.getProductsArtisan);
 module.exports = router;
