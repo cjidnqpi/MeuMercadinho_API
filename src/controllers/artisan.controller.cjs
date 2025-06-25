@@ -99,7 +99,7 @@ exports.getProductsArtisan = (req, res) => {
 
 exports.deleteProduct = (req, res) => {
     const artisanId = req.user.id;
-    const productId = parseInt(req.params.productId);
+    const productId = parseInt(req.query.productId);
 
     if (isNaN(productId)) {
         return res.status(400).json({ error: "Paramètre 'productId' invalide." });
