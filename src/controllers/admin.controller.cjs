@@ -63,3 +63,53 @@ exports.getWaitingUsers = (req, res) => {
         res.status(200).json(rows);
     });
 }
+
+exports.waitingUserDecision = (req, res) => {
+    if (!req.user || req.user.type !== 0) {
+        return res.status(403).json({ message: 'Accès refusé : droits insuffisants.' });
+    }
+
+    const { id, decision } = req.body;
+
+    if (typeof id !== 'number' || (decision !== 'accept' && decision !== 'reject')) {
+        return res.status(400).json({ message: 'Paramètres invalides.' });
+    }
+
+    if (decision === 'accept') {
+        // Accepter : transférer puis supprimer
+        db.run(
+            `INSERT INTO users (email, password, name, type, cpf)
+             SELECT email, password, name, type, cnpj FROM waiting_line WHERE id = ?`,
+            [id],
+            function(err) {
+                if (err) {
+                    console.error('Erreur lors de l’acceptation :', err);
+                    return res.status(500).json({ message: 'Erreur interne du serveur.' });
+                }
+                if (this.changes === 0) {
+                    return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+                }
+                // Suppression après insertion
+                db.run(`DELETE FROM waiting_line WHERE id = ?`, [id], function(err) {
+                    if (err) {
+                        console.error('Erreur lors de la suppression après acceptation :', err);
+                        return res.status(500).json({ message: 'Erreur interne lors du nettoyage.' });
+                    }
+                    res.status(200).json({ message: 'Utilisateur accepté et supprimé de la waiting line.' });
+                });
+            }
+        );
+    } else {
+        // Rejet : suppression simple
+        db.run(`DELETE FROM waiting_line WHERE id = ?`, [id], function(err) {
+            if (err) {
+                console.error('Erreur lors du rejet :', err);
+                return res.status(500).json({ message: 'Erreur interne du serveur.' });
+            }
+            if (this.changes === 0) {
+                return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+            }
+            res.status(200).json({ message: 'Utilisateur rejeté et supprimé de la waiting line.' });
+        });
+    }
+};
