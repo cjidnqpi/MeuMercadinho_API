@@ -71,3 +71,73 @@ exports.addProduct = (req, res) => {
   });
 };
 
+exports.getProductsArtisan = (req, res) => {
+    const artisanId = req.user.id;
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    if (isNaN(artisanId)) {
+        return res.status(400).json({ error: "L'en-tête 'artisan-id' est requis et doit être un entier." });
+    }
+
+    db.all(
+        `SELECT products.*, users.name AS artisan_name 
+         FROM products 
+         JOIN users ON products.artisan_id = users.id 
+         WHERE products.artisan_id = ?
+         LIMIT ? OFFSET ?`,
+        [artisanId, limit, offset],
+        (err, rows) => {
+            if (err) {
+                console.error("Erreur lors de la récupération des produits :", err);
+                return res.status(500).json({ error: 'Erreur serveur' });
+            }
+            res.json(rows);
+        }
+    );
+};
+
+exports.deleteProduct = (req, res) => {
+    const artisanId = req.user.id;
+    const productId = parseInt(req.params.productId);
+
+    if (isNaN(productId)) {
+        return res.status(400).json({ error: "Paramètre 'productId' invalide." });
+    }
+
+    db.get(
+        `SELECT * FROM products WHERE id = ? AND artisan_id = ?`,
+        [productId, artisanId],
+        (err, product) => {
+            if (err) {
+                console.error("Erreur lors de la recherche du produit :", err);
+                return res.status(500).json({ error: "Erreur serveur" });
+            }
+            if (!product) {
+                return res.status(404).json({ error: "Produit non trouvé ou non autorisé." });
+            }
+
+            // Supprimer le fichier image associé si présent
+            if (product.photo_url) {
+                const imagePath = path.join(__dirname, "../../", product.photo_url);
+                fs.unlink(imagePath, (fsErr) => {
+                    if (fsErr && fsErr.code !== 'ENOENT') {
+                        console.error("Erreur lors de la suppression de l'image :", fsErr);
+                    }
+                });
+            }
+
+            db.run(
+                `DELETE FROM products WHERE id = ? AND artisan_id = ?`,
+                [productId, artisanId],
+                function (dbErr) {
+                    if (dbErr) {
+                        console.error("Erreur lors de la suppression du produit :", dbErr);
+                        return res.status(500).json({ error: "Erreur lors de la suppression du produit" });
+                    }
+                    res.json({ message: "Produit supprimé avec succès." });
+                }
+            );
+        }
+    );
+};

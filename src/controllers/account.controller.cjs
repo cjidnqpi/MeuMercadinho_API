@@ -97,29 +97,3 @@ exports.getProducts = (req, res) => {
         }
     );
 }
-
-exports.getProductsArtisan = (req, res) => {
-    const artisanId = parseInt(req.query.id); // Ex: artisan-id: 3
-    const offset = parseInt(req.query.offset) || 0;
-    const limit = parseInt(req.query.limit) || 10;
-
-    if (isNaN(artisanId)) {
-        return res.status(400).json({ error: "L'en-tête 'artisan-id' est requis et doit être un entier." });
-    }
-
-    db.all(
-        `SELECT products.*, users.name AS artisan_name 
-         FROM products 
-         JOIN users ON products.artisan_id = users.id 
-         WHERE products.artisan_id = ?
-         LIMIT ? OFFSET ?`,
-        [artisanId, limit, offset],
-        (err, rows) => {
-            if (err) {
-                console.error("Erreur lors de la récupération des produits :", err);
-                return res.status(500).json({ error: 'Erreur serveur' });
-            }
-            res.json(rows);
-        }
-    );
-};
