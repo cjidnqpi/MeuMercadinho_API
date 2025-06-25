@@ -140,6 +140,7 @@ db.serialize(() => {
         if (row.count === 0) {
             console.log("Insertion de produits d'exemple...");
             const stmt = db.prepare("INSERT INTO products (artisan_id, name, quantity, price, description) VALUES (?, ?, ?, ?, ?)");
+            stmt.run(2, "my only product", 3, 45.5, "description de mon unique produit");
             for (let i = 1; i <= 10; i++) {
                 const artisanId = i + 1; // correspond à users.id > 1 (type = 1)
                 const name = `Produit ${i}`;
