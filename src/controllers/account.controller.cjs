@@ -51,3 +51,29 @@ exports.setProfilePicture = (req, res) => {
     });
   });
 };
+
+exports.updateAccount = (req, res) => {
+    const { name, email, cpf, phone } = req.body;
+    const id = req.user.id;
+    
+    if (!id) {
+        return res.status(400).json({ error: "ID utilisateur requis" });
+    }
+    
+    if (!name || !email) {
+        return res.status(400).json({ error: "Nom et email requis" });
+    }
+    
+    db.run("UPDATE users SET name = ?, email = ?, cpf = ?, phone = ? WHERE id = ?", [name, email, cpf,phone, id], function (err) {
+        if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Erreur lors de la mise à jour du compte" });
+        }
+    
+        if (this.changes === 0) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+    
+        res.json({ message: "Compte mis à jour avec succès" });
+    });
+};
