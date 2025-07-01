@@ -38,14 +38,21 @@ exports.addProduct = (req, res) => {
     }
 
     const { name, quantity, price, description } = req.body;
-    const artisan_id = req.user.id;
 
-    if (!artisan_id || !name || quantity == null || price == null) {
-      return res.status(400).json({ error: "Champs obligatoires manquants : 'name', 'quantity', 'price'" });
+    const parsedQuantity = parseInt(quantity, 10);
+    const parsedPrice = parseFloat(price);
+    const artisan_id = req.user?.id;
+
+    // Vérification des champs obligatoires
+    if (!artisan_id || !name || isNaN(parsedQuantity) || isNaN(parsedPrice)) {
+      return res.status(400).json({
+        error: "Champs obligatoires manquants ou invalides : 'name', 'quantity' (entier), 'price' (nombre), 'artisan_id'."
+      });
     }
 
+    // Vérification de l'image
     if (!req.file) {
-      return res.status(400).json({ error: "L'image du produit (PNG) est requise" });
+      return res.status(400).json({ error: "L'image du produit (format PNG) est requise." });
     }
 
     const photo_url = `/uploads/${req.file.filename}`;
@@ -54,22 +61,30 @@ exports.addProduct = (req, res) => {
       INSERT INTO products (artisan_id, name, quantity, price, photo_url, description)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const params = [artisan_id, name, quantity, price, photo_url, description || null];
+    const params = [
+      artisan_id,
+      name.trim(),
+      parsedQuantity,
+      parsedPrice,
+      photo_url,
+      description?.trim() || null
+    ];
 
     db.run(query, params, function (dbErr) {
       if (dbErr) {
         console.error("Erreur base de données :", dbErr);
-        return res.status(500).json({ error: "Erreur lors de l'ajout du produit" });
+        return res.status(500).json({ error: "Erreur lors de l'ajout du produit à la base de données." });
       }
 
       res.status(201).json({
-        message: "Produit ajouté avec succès",
+        message: "Produit ajouté avec succès.",
         product_id: this.lastID,
         photo_url
       });
     });
   });
 };
+
 
 exports.getProductsArtisan = (req, res) => {
     const artisanId = req.user.id;
