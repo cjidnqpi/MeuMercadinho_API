@@ -113,3 +113,56 @@ exports.waitingUserDecision = (req, res) => {
         });
     }
 };
+
+exports.deleteProductAdmin = (req, res) => {
+    const userId = req.user.id;
+    const userType = req.user.type; // on suppose que le type est dans req.user.type
+    const productId = parseInt(req.query.productId);
+
+    if (isNaN(productId)) {
+        return res.status(400).json({ error: "Paramètre 'productId' invalide." });
+    }
+
+    // Requête différente selon type utilisateur
+    const query = userType === 1
+        ? `SELECT * FROM products WHERE id = ?`           // admin : n'importe quel produit
+        : `SELECT * FROM products WHERE id = ? AND artisan_id = ?`;  // artisan : seulement ses produits
+
+    const params = userType === 1 ? [productId] : [productId, userId];
+
+    db.get(query, params, (err, product) => {
+        if (err) {
+            console.error("Erreur lors de la recherche du produit :", err);
+            return res.status(500).json({ error: "Erreur serveur" });
+        }
+        if (!product) {
+            return res.status(404).json({ error: "Produit non trouvé ou non autorisé." });
+        }
+
+        // Supprimer le fichier image associé si présent
+        if (product.photo_url) {
+            const imagePath = path.join(__dirname, "../../", product.photo_url);
+            fs.unlink(imagePath, (fsErr) => {
+                if (fsErr && fsErr.code !== 'ENOENT') {
+                    console.error("Erreur lors de la suppression de l'image :", fsErr);
+                }
+            });
+        }
+
+        // Suppression du produit
+        const deleteQuery = userType === 1
+            ? `DELETE FROM products WHERE id = ?`
+            : `DELETE FROM products WHERE id = ? AND artisan_id = ?`;
+
+        const deleteParams = userType === 1 ? [productId] : [productId, userId];
+
+        db.run(deleteQuery, deleteParams, function (dbErr) {
+            if (dbErr) {
+                console.error("Erreur lors de la suppression du produit :", dbErr);
+                return res.status(500).json({ error: "Erreur lors de la suppression du produit" });
+            }
+            res.json({ message: "Produit supprimé avec succès." });
+        });
+    });
+};
+

@@ -7,5 +7,6 @@ router.get('/get-users', verifyToken, adminCtrl.getUsers);
 router.post('/change-type', verifyToken, adminCtrl.changeType);
 router.get('/get-waiting-users', verifyToken, adminCtrl.getWaitingUsers);
 router.post('/waiting-user-decision', verifyToken, adminCtrl.waitingUserDecision);
+router.delete('/delete-product', verifyToken, adminCtrl.deleteProductAdmin);
 
 module.exports = router;
