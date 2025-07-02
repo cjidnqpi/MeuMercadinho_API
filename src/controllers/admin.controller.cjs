@@ -124,11 +124,11 @@ exports.deleteProductAdmin = (req, res) => {
     }
 
     // Requête différente selon type utilisateur
-    const query = userType === 1
+    const query = userType === 0
         ? `SELECT * FROM products WHERE id = ?`           // admin : n'importe quel produit
         : `SELECT * FROM products WHERE id = ? AND artisan_id = ?`;  // artisan : seulement ses produits
 
-    const params = userType === 1 ? [productId] : [productId, userId];
+    const params = userType === 0 ? [productId] : [productId, userId];
 
     db.get(query, params, (err, product) => {
         if (err) {
