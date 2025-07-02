@@ -172,7 +172,7 @@ exports.getArtisanProductsInOrders = (req, res) => {
         JOIN order_items oi ON p.id = oi.product_id
         JOIN orders o ON o.id = oi.order_id
         WHERE p.artisan_id = ?
-        ORDER BY o.order_date DESC, o.order_time DESC
+        ORDER BY o.order_date DESC, o.order_time DESC, o.id DESC
         LIMIT ? OFFSET ?
     `;
 
@@ -181,6 +181,7 @@ exports.getArtisanProductsInOrders = (req, res) => {
             console.error("Erreur lors de la récupération des produits artisan commandés :", err);
             return res.status(500).json({ error: "Erreur serveur lors de la récupération des produits." });
         }
+
         res.json(rows);
     });
 };
