@@ -150,11 +150,11 @@ exports.deleteProductAdmin = (req, res) => {
         }
 
         // Suppression du produit
-        const deleteQuery = userType === 1
+        const deleteQuery = userType === 0
             ? `DELETE FROM products WHERE id = ?`
             : `DELETE FROM products WHERE id = ? AND artisan_id = ?`;
 
-        const deleteParams = userType === 1 ? [productId] : [productId, userId];
+        const deleteParams = userType === 0 ? [productId] : [productId, userId];
 
         db.run(deleteQuery, deleteParams, function (dbErr) {
             if (dbErr) {
