@@ -6,5 +6,6 @@ const verifyToken = require('../middlewares/verifyTokens.cjs');
 router.post('/add-product', verifyToken, artisanCtrl.addProduct);
 router.get('/get-products', verifyToken, artisanCtrl.getProductsArtisan);
 router.delete('/delete-product', verifyToken, artisanCtrl.deleteProduct);
+router.get('/get-deliveries', verifyToken, artisanCtrl.getArtisanProductsInOrders);
 
 module.exports = router;

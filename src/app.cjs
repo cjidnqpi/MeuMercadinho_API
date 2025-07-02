@@ -5,6 +5,7 @@ const routesApp = require('./routes/app.routes.cjs');
 const adminRoutes = require('./routes/admin.routes.cjs');
 const accountRoutes = require('./routes/account.routes.cjs');
 const artisanRoutes = require('./routes/artisan.routes.cjs');
+const customersRoutes = require('./routes/customers.routes.cjs');
 const path = require('path');
 require('dotenv').config();
 
@@ -14,6 +15,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/artisan', artisanRoutes);
+app.use('/api/customers', customersRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 module.exports = app;

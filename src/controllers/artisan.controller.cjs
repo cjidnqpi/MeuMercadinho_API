@@ -156,3 +156,31 @@ exports.deleteProduct = (req, res) => {
         }
     );
 };
+
+exports.getArtisanProductsInOrders = (req, res) => {
+    const artisanId = req.user?.id;
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+
+    if (!artisanId || isNaN(artisanId)) {
+        return res.status(400).json({ error: "ID artisan invalide ou non authentifié." });
+    }
+
+    const sql = `
+        SELECT p.*, oi.quantity AS ordered_quantity, o.id AS order_id, o.client_id, o.order_date, o.order_time
+        FROM products p
+        JOIN order_items oi ON p.id = oi.product_id
+        JOIN orders o ON o.id = oi.order_id
+        WHERE p.artisan_id = ?
+        ORDER BY o.order_date DESC, o.order_time DESC
+        LIMIT ? OFFSET ?
+    `;
+
+    db.all(sql, [artisanId, limit, offset], (err, rows) => {
+        if (err) {
+            console.error("Erreur lors de la récupération des produits artisan commandés :", err);
+            return res.status(500).json({ error: "Erreur serveur lors de la récupération des produits." });
+        }
+        res.json(rows);
+    });
+};

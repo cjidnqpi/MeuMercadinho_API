@@ -85,6 +85,27 @@ db.serialize(() => {
             FOREIGN KEY (artisan_id) REFERENCES users(id)
         )
     `);
+    db.run(`
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            client_id INTEGER NOT NULL,
+            order_date TEXT NOT NULL,
+            order_time TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (client_id) REFERENCES users(id)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS order_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(id),
+            FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+    `);
 
     // Insertion utilisateurs
     db.get("SELECT COUNT(*) AS count FROM users", (err, row) => {
@@ -98,6 +119,7 @@ db.serialize(() => {
             const hash = bcrypt.hashSync("admin123", saltRounds);
             stmt.run("admin@admin.com", hash, 0, "Admin");
             stmt.run("artisan@artisan.com", hash, 2, "Artisan");
+            stmt.run("client@client.com", hash, 1, "Client");
             for (let i = 1; i <= 30; i++) {
                 const email = generateEmail(i);
                 const name = generateName(i);
