@@ -7,5 +7,6 @@ router.get('/get-products', verifyToken, customersCtrl.getClientProducts);
 router.get('/get-deliveries', verifyToken, customersCtrl.getDelivery);
 router.post('/create-delivery', verifyToken, customersCtrl.createDelivery);
 router.post('/add-product', verifyToken, customersCtrl.addProductToKart);
+router.delete('/delete-product', verifyToken, customersCtrl.deleteProductFromKart);
 
 module.exports = router;

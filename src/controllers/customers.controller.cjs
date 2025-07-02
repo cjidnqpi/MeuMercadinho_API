@@ -29,7 +29,6 @@ exports.getClientProducts = (req, res) => {
     });
 };
 
-// ✅ 1. Récupère la commande existante (s’il y en a une)
 exports.getDelivery = (req, res) => {
     const clientId = req.user?.id;
     if (!clientId) {
@@ -50,7 +49,6 @@ exports.getDelivery = (req, res) => {
     });
 };
 
-// ✅ 2. Crée une commande si aucune n'existe
 exports.createDelivery = (req, res) => {
     const clientId = req.user?.id;
     const { order_date, order_time } = req.body;
@@ -142,3 +140,63 @@ exports.addProductToKart = (req, res) => {
     });
 };
 
+exports.deleteProductFromKart = (req, res) => {
+    const clientId = req.user?.id;
+    const { order_id, product_id } = req.body;
+
+    if (!clientId || !order_id || !product_id) {
+        return res.status(400).json({ error: "Paramètres manquants." });
+    }
+
+    // Vérifie que la commande appartient bien à ce client
+    const checkOrderSql = `SELECT * FROM orders WHERE id = ? AND client_id = ?`;
+
+    db.get(checkOrderSql, [order_id, clientId], (err, order) => {
+        if (err) {
+            console.error("❌ Erreur lors de la vérification de la commande :", err);
+            return res.status(500).json({ error: "Erreur serveur." });
+        }
+
+        if (!order) {
+            return res.status(403).json({ error: "Commande non trouvée ou non autorisée." });
+        }
+
+        // Récupère la quantité commandée
+        const getQuantitySql = `SELECT quantity FROM order_items WHERE order_id = ? AND product_id = ?`;
+
+        db.get(getQuantitySql, [order_id, product_id], (err, row) => {
+            if (err) {
+                console.error("❌ Erreur lors de la récupération de la quantité :", err);
+                return res.status(500).json({ error: "Erreur serveur." });
+            }
+
+            if (!row) {
+                return res.status(404).json({ error: "Produit non trouvé dans la commande." });
+            }
+
+            const quantityToRestore = row.quantity;
+
+            // Supprime le produit de la commande
+            const deleteSql = `DELETE FROM order_items WHERE order_id = ? AND product_id = ?`;
+
+            db.run(deleteSql, [order_id, product_id], function (err2) {
+                if (err2) {
+                    console.error("❌ Erreur lors de la suppression du produit :", err2);
+                    return res.status(500).json({ error: "Erreur lors de la suppression." });
+                }
+
+                // Restaure la quantité dans les stocks
+                const restoreStockSql = `UPDATE products SET quantity = quantity + ? WHERE id = ?`;
+
+                db.run(restoreStockSql, [quantityToRestore, product_id], function (err3) {
+                    if (err3) {
+                        console.error("❌ Erreur lors de la restauration du stock :", err3);
+                        return res.status(500).json({ error: "Erreur mise à jour stock." });
+                    }
+
+                    return res.status(200).json({ message: "Produit supprimé du panier avec succès." });
+                });
+            });
+        });
+    });
+};
