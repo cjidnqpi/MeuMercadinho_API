@@ -200,3 +200,33 @@ exports.deleteProductFromKart = (req, res) => {
         });
     });
 };
+
+exports.searchProductsByName = (req, res) => {
+    const searchTerm = req.query.name;
+
+    if (!searchTerm || searchTerm.trim() === "") {
+        return res.status(400).json({ error: "Le nom du produit est requis." });
+    }
+
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    const sql = `
+        SELECT * FROM products
+        WHERE LOWER(name) LIKE LOWER(?)
+        ORDER BY name ASC
+        LIMIT ? OFFSET ?
+    `;
+
+    const wildcardName = `%${searchTerm}%`;
+
+    db.all(sql, [wildcardName, limit, offset], (err, rows) => {
+        if (err) {
+            console.error("❌ Erreur lors de la recherche de produits :", err);
+            return res.status(500).json({ error: "Erreur serveur." });
+        }
+
+        return res.json(rows);
+    });
+};
+

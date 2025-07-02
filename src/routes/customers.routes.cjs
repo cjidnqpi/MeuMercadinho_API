@@ -8,5 +8,6 @@ router.get('/get-deliveries', verifyToken, customersCtrl.getDelivery);
 router.post('/create-delivery', verifyToken, customersCtrl.createDelivery);
 router.post('/add-product', verifyToken, customersCtrl.addProductToKart);
 router.post('/delete-product', verifyToken, customersCtrl.deleteProductFromKart);
+router.get('/search-products', verifyToken, customersCtrl.searchProductsByName);
 
 module.exports = router;
